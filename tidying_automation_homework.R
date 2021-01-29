@@ -21,6 +21,8 @@ ds2 <- read_csv(paths[2])
 ds3 <- read_csv(paths[3])
 ds_combined <- bind_rows(ds1, ds2, ds3)
 
+rm(list = ls()) #Clean out workspace
+
 ### Question 1 ---------- 
 
 #For this assignment, you created a fork from the Github repo and cloned your own copy
@@ -28,7 +30,7 @@ ds_combined <- bind_rows(ds1, ds2, ds3)
 #Make your repository public and paste the link here:
 
 #ANSWER
-#YOUR GITHUB LINK: 
+#YOUR GITHUB LINK: https://github.com/tvo015/259-tidying-automation-homework
 
 ### Question 2 ---------- 
 
@@ -36,16 +38,33 @@ ds_combined <- bind_rows(ds1, ds2, ds3)
 #(Yes, Vroom does this automatically but practice doing it with a loop)
 #If you did this correctly, it should look the same as ds_combined created above
 
+
+ds_loop <- read_csv(paths[1], skip=1, col_names = c("Film", "Race", "Female", "Male"))
+ds_loop <- ds_loop %>%filter(FALSE)
+
+for (file in paths) {
+  temp_ds <- read_csv(file, skip=1, col_names = c("Film","Race", "Female", "Male"))
+  ds_loop <-bind_rows(ds_loop, temp_ds)
+}
+
+
 ### Question 3 ----------
 
 #Use map with paths to read in the data to a single tibble called ds_map
 #If you did this correctly, it should look the same as ds_combined created above
+map(paths, ~toupper(.x))
+
+ds_map <- map_dfr(paths, ~ read_csv(.x, skip=1, col_names=c("Film","Race", "Female", "Male")))
+
 
 ### Question 4 ----------
 
 #The data are in a wider-than-ideal format. 
 #Use pivot_longer to reshape the data so that sex is a column with values male/female and words is a column
 #Use ds_combined or one of the ones you created in Question 2 or 3, and save the output to ds_longer
+ds_longer <-pivot_longer(ds_map, cols = -(Film:Race), names_to = "sex", values_to="words")
+
+
 
 ### Question 5 ----------
 
@@ -54,6 +73,12 @@ ds_combined <- bind_rows(ds1, ds2, ds3)
 #Merge it into ds_longer and then create a new column that expresses the words spoken as a percentage of the total
 total_words <- tibble(Film =  c("The Fellowship Of The Ring", "The Two Towers","The Return Of The King"),
                       Total = c(177277, 143436, 134462))
+
+
+ds_longer <- merge(ds_longer, total_words, by="Film")
+ds_longer<-ds_longer%>%mutate((percent=words/Total)*100)
+
+
 
 ### Question 6 ----------
 #The function below creates a graph to compare the words spoken by race/sex for a single film
@@ -67,6 +92,10 @@ words_graph <- function(df) {
   print(p)
 }
 
+Film<-c("The Fellowship Of The Ring", "")
+
+
+
 ### Question 7 ----------
 
 #Apply the words_graph function again, but this time
@@ -78,6 +107,7 @@ words_graph <- function(df) {
 #and separate columns for the words spoken by each race and the percentage of words spoken by each race
 #First, get the data formatted in the correct way
 #From ds_longer, create a new tibble "ds_wider" that has columns for words for each race and percentage for each race
+
 
 ### Question 9 ---------
 
