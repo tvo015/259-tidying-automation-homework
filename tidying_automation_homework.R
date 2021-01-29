@@ -3,6 +3,7 @@
 #For full credit, provide answers for at least 6/9 questions
 
 #List names of students collaborating with: 
+#Hea Jung Lee
 
 ### SETUP: RUN THIS BEFORE STARTING ----------
 
@@ -75,9 +76,9 @@ total_words <- tibble(Film =  c("The Fellowship Of The Ring", "The Two Towers","
                       Total = c(177277, 143436, 134462))
 
 
-ds_longer <- merge(ds_longer, total_words, by="Film")
-ds_longer<-ds_longer%>%mutate((percent=words/Total)*100)
 
+
+ds_longer<-ds_longer%>%mutate(Total_Percentage=(ds_longer$words/total_words$Total)*100)
 
 
 ### Question 6 ----------
@@ -85,15 +86,21 @@ ds_longer<-ds_longer%>%mutate((percent=words/Total)*100)
 #The input for the function is a tibble that contains only a single film
 #Write a for loop that iterates through the film names to apply the function to a subset of ds_longer (each film)
 #Run all 6 lines code below to define the function (it should show in your environment after running)
+
 words_graph <- function(df) {
-  p <- ggplot(df, aes(x = Race, y = Words, fill = Sex)) + 
+  p <- ggplot(df, aes(x = Race, y = words, fill = sex)) + 
     geom_bar(stat = "identity", position = "dodge") + 
     ggtitle(df$Film) + theme_minimal()
   print(p)
 }
 
-Film<-c("The Fellowship Of The Ring", "")
 
+ds_list <-split(ds_longer, as.factor(ds_longer$Film))
+
+for(x in ds_list) {
+  words_graph(x)
+  
+}
 
 
 ### Question 7 ----------
